@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios-0.18.0.js"></script>
+    <style>
+        label{
+            display: inline-block;
+            width: 200px;
+            text-align: right;
+        }
+        #app{
+            padding-left: 25%;
+            padding-right: 25%;
+        }
+        button{
+            margin-left: 25%;
+            margin-right: 25%;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <label>书名</label><input v-model="book.name"><br>
+    <label>出版社</label><input v-model="book.press"><br>
+    <label>出版时间</label><input v-model="book.date"><br>
+    <label>作者</label><input v-model="book.author"><br>
+    <label>数量</label><input v-model="book.count"><br>
+    <label>图片</label><input id='fileInput' type="file"><br>
+    <button @click="add">添加</button>
+</div>
+</body>
+
+<script>
+    var app = new Vue({
+        el:'#app',
+        data:{
+            book:{
+                name:'',
+                press:'',
+                date:'',
+                author:'',
+                count:'',
+            }
+        },
+        methods:{
+            add() {
+                // 创建FormData对象
+                var formData = new FormData();
+
+                // 将表单数据添加到formData中
+                formData.append("bookname", this.book.name);
+                formData.append("bookpress", this.book.press);
+                formData.append("pressdate", this.book.date);
+                formData.append("bookauthor", this.book.author);
+                formData.append("bookcount", this.book.count);
+
+                // 获取文件输入框中的图片文件
+                var fileInput = document.getElementById('fileInput');
+                var file = fileInput.files[0];
+
+                // 将图片文件添加到formData中
+                formData.append('image', file);
+
+                // 发送请求
+                axios.post('books.action?op=add', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                    .then(result => {
+                        if (result.data.code == 1) {
+                            alert("添加成功");
+                            window.location.href = 'index.html';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('添加失败：', error);
+                    });
+            }
+        }
+    })
+</script>
+</html>
